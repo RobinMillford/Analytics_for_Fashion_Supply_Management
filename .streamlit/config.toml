@@ -1,0 +1,14 @@
+[theme]
+primaryColor = "#008080"
+backgroundColor = "#000000"
+# secondaryBackgroundColor = "#154360"
+secondaryBackgroundColor = "#393939"
+textColor = "#fafafa"
+font = "monospace"
+
+[server]
+# Enable static file serving
+enableStaticServing = true
+
+# Automatically refresh the app when changes are detected
+runOnSave = true
