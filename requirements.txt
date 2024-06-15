@@ -3,3 +3,4 @@ pandas
 nbformat
 plotly
 duckdb
+statsmodels
