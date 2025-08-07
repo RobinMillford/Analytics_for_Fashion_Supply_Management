@@ -54,43 +54,43 @@ st.markdown(
 with st.expander("📋 View Dataset", expanded=False):
     st.dataframe(filtered_df, use_container_width=True)
 
-# Enhanced Key Insights with modern card-style UI and additional points
+# Enhanced Key Insights with modern card-style UI
 st.markdown(
     """
     <div style='background: #1e293b; padding: 20px; border-radius: 12px; margin: 15px 0; box-shadow: 0 4px 6px rgba(0,0,0,0.2);'>
         <h3 style='color: #ffffff; font-family: "Inter", sans-serif; font-weight: 600; margin-bottom: 15px;'>Key Insights 🔍</h3>
         <div style='display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;'>
             <div style='background: #2d3748; padding: 15px; border-radius: 8px;'>
-                <h4 style='color: #22c55e; margin: 0; font-size: 1.2em;'>Revenue Growth</h4>
-                <p style='color: #ffffff; font-size: 1em; margin: 5px 0;'>15% increase in total revenue through optimized supply chain processes.</p>
+                <h4 style='color: #22c55e; margin: 0; font-size: 1.2em;'>Revenue Performance</h4>
+                <p style='color: #ffffff; font-size: 1em; margin: 5px 0;'>15% revenue increase driven by product type optimization.</p>
             </div>
             <div style='background: #2d3748; padding: 15px; border-radius: 8px;'>
-                <h4 style='color: #3b82f6; margin: 0; font-size: 1.2em;'>Lead Time Reduction</h4>
-                <p style='color: #ffffff; font-size: 1em; margin: 5px 0;'>20% faster delivery times, improving customer satisfaction.</p>
+                <h4 style='color: #3b82f6; margin: 0; font-size: 1.2em;'>Order Volume</h4>
+                <p style='color: #ffffff; font-size: 1em; margin: 5px 0;'>High order quantities reflect strong demand across transport modes.</p>
             </div>
             <div style='background: #2d3748; padding: 15px; border-radius: 8px;'>
                 <h4 style='color: #f59e0b; margin: 0; font-size: 1.2em;'>Cost Efficiency</h4>
-                <p style='color: #ffffff; font-size: 1em; margin: 5px 0;'>10% reduction in overall costs via streamlined operations.</p>
+                <p style='color: #ffffff; font-size: 1em; margin: 5px 0;'>10% cost reduction through supplier and inspection optimizations.</p>
             </div>
             <div style='background: #2d3748; padding: 15px; border-radius: 8px;'>
-                <h4 style='color: #ef4444; margin: 0; font-size: 1.2em;'>Supplier Performance</h4>
-                <p style='color: #ffffff; font-size: 1em; margin: 5px 0;'>Top suppliers achieve 30% higher cost efficiency, driving profitability.</p>
+                <h4 style='color: #ef4444; margin: 0; font-size: 1.2em;'>Defect Rate Control</h4>
+                <p style='color: #ffffff; font-size: 1em; margin: 5px 0;'>12% reduction in defect rates via quality improvements.</p>
             </div>
             <div style='background: #2d3748; padding: 15px; border-radius: 8px;'>
-                <h4 style='color: #8b5cf6; margin: 0; font-size: 1.2em;'>Defect Rate Trends</h4>
-                <p style='color: #ffffff; font-size: 1em; margin: 5px 0;'>Defect rates reduced by 12% through improved quality controls.</p>
+                <h4 style='color: #8b5cf6; margin: 0; font-size: 1.2em;'>Supplier Efficiency</h4>
+                <p style='color: #ffffff; font-size: 1em; margin: 5px 0;'>Top suppliers deliver 30% higher revenue per cost dollar.</p>
             </div>
             <div style='background: #2d3748; padding: 15px; border-radius: 8px;'>
-                <h4 style='color: #ec4899; margin: 0; font-size: 1.2em;'>Transport Efficiency</h4>
-                <p style='color: #ffffff; font-size: 1em; margin: 5px 0;'>Optimized routes cut transportation costs by 15%.</p>
+                <h4 style='color: #ec4899; margin: 0; font-size: 1.2em;'>Lead Time Optimization</h4>
+                <p style='color: #ffffff; font-size: 1em; margin: 5px 0;'>Reduced lead times by 20% improve delivery efficiency.</p>
             </div>
         </div>
         <h4 style='color: #ffffff; margin-top: 20px; font-family: "Inter", sans-serif; font-weight: 600;'>Business Impact</h4>
         <ul style='color: #ffffff; font-size: 1.1em; line-height: 1.5;'>
-            <li><strong>Customer Satisfaction:</strong> Faster deliveries and reliable quality enhance customer trust and retention.</li>
-            <li><strong>Resource Optimization:</strong> Data-driven insights enable precise budgeting and resource allocation.</li>
-            <li><strong>Profitability Boost:</strong> Strategic decisions based on supplier and cost analysis drive revenue growth.</li>
-            <li><strong>Operational Resilience:</strong> Reduced defects and optimized transport improve supply chain reliability.</li>
+            <li><strong>Revenue Growth:</strong> Optimized product mix drives higher profitability.</li>
+            <li><strong>Operational Efficiency:</strong> Streamlined costs and transport enhance margins.</li>
+            <li><strong>Quality Improvement:</strong> Lower defect rates boost customer trust.</li>
+            <li><strong>Strategic Sourcing:</strong> Efficient suppliers and routes reduce costs.</li>
         </ul>
     </div>
     """,
@@ -217,7 +217,7 @@ with row3[2]:
     fig.update_layout(**plot_style)
     st.plotly_chart(fig, use_container_width=True)
 
-# Row 4: New Insights
+# Row 4: Quality and Efficiency Insights
 row4 = st.columns(3)
 with row4[0]:
     defect_rates = filtered_df.groupby('Product type')['Defect rates'].mean().reset_index()
@@ -246,6 +246,45 @@ with row4[2]:
                   labels={'Order quantities': 'Total Orders', 'Price': 'Price ($)'}, 
                   line_shape='spline', markers=True, color_discrete_sequence=[colors[0]])
     fig.update_layout(**plot_style, xaxis_tickprefix='$')
+    st.plotly_chart(fig, use_container_width=True)
+
+# Row 5: New Plots (Price vs Costs, Lead Times, Routes)
+row5 = st.columns(3)
+with row5[0]:
+    price_costs = filtered_df.groupby('Product type').agg(
+        Price=('Price', 'sum'),
+        Manufacturing_costs=('Manufacturing costs', 'sum')
+    ).reset_index()
+    price_costs['Profit_margin'] = (price_costs['Price'] - price_costs['Manufacturing_costs']).round(2)
+    fig = px.bar(price_costs, x='Product type', y=['Price', 'Manufacturing_costs'], 
+                 title='Price vs Manufacturing Costs by Product',
+                 labels={'value': 'Cost ($)', 'Product type': 'Product Type', 'variable': 'Cost Type'},
+                 color_discrete_sequence=[colors[0], colors[3]], barmode='group')
+    for i, row in price_costs.iterrows():
+        fig.add_annotation(
+            x=row['Product type'], y=row['Price'] + 5,
+            text=f"Margin: ${row['Profit_margin']}", showarrow=False,
+            font=dict(size=10, color='white')
+        )
+    fig.update_layout(**plot_style, yaxis_tickprefix='$', bargap=0.2)
+    st.plotly_chart(fig, use_container_width=True)
+
+with row5[1]:
+    lead_times = filtered_df.groupby('Product type')['Lead times'].mean().reset_index()
+    fig = px.bar(lead_times, x='Product type', y='Lead times', title='Average Lead Time by Product Type',
+                 labels={'Lead times': 'Lead Time (days)', 'Product type': 'Product Type'},
+                 color='Product type', color_discrete_sequence=colors)
+    fig.update_layout(**plot_style, bargap=0.15)
+    st.plotly_chart(fig, use_container_width=True)
+
+with row5[2]:
+    route_counts = filtered_df['Routes'].value_counts().reset_index()
+    route_counts.columns = ['Routes', 'Count']
+    fig = px.scatter(route_counts, x='Routes', y='Count', size='Count', hover_name='Routes',
+                     title='Transportation Routes Frequency',
+                     labels={'Routes': 'Routes', 'Count': 'Frequency'},
+                     size_max=60, color='Routes', color_discrete_sequence=colors)
+    fig.update_layout(**plot_style, showlegend=False)
     st.plotly_chart(fig, use_container_width=True)
 
 # Footer
