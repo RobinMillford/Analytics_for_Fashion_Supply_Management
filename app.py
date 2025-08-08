@@ -4,6 +4,7 @@ import plotly.express as px
 import pandas as pd
 import duckdb
 import time
+import numpy as np
 
 # Set page configuration
 st.set_page_config(page_title="Supply Chain Dashboard", page_icon=":bar_chart:", layout="wide")
@@ -43,7 +44,7 @@ with st.spinner('Loading dashboard...'):
 # Modern UI header
 st.markdown(
     """
-    <div style='text-align: center; background: linear-gradient(135deg, #1e3a8a, #3b82f6); padding: 20px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.2);'>
+    <div style='text-align: center; background: linear-gradient(135deg, #1e40af, #60a5fa); padding: 20px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.2);'>
         <h1 style='font-size: 2.5em; font-family: "Inter", sans-serif; font-weight: 700; color: #ffffff;'>📊 Supply Chain Insights</h1>
     </div>
     """,
@@ -54,22 +55,22 @@ st.markdown(
 with st.expander("📋 View Dataset", expanded=False):
     st.dataframe(filtered_df, use_container_width=True)
 
-# Enhanced Key Insights with modern card-style UI
+# Enhanced Key Insights with new KPIs
 st.markdown(
     """
     <div style='background: #1e293b; padding: 20px; border-radius: 12px; margin: 15px 0; box-shadow: 0 4px 6px rgba(0,0,0,0.2);'>
         <h3 style='color: #ffffff; font-family: "Inter", sans-serif; font-weight: 600; margin-bottom: 15px;'>Key Insights 🔍</h3>
         <div style='display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;'>
             <div style='background: #2d3748; padding: 15px; border-radius: 8px;'>
-                <h4 style='color: #22c55e; margin: 0; font-size: 1.2em;'>Revenue Performance</h4>
+                <h4 style='color: #22d3ee; margin: 0; font-size: 1.2em;'>Revenue Performance</h4>
                 <p style='color: #ffffff; font-size: 1em; margin: 5px 0;'>15% revenue increase driven by product type optimization.</p>
             </div>
             <div style='background: #2d3748; padding: 15px; border-radius: 8px;'>
-                <h4 style='color: #3b82f6; margin: 0; font-size: 1.2em;'>Order Volume</h4>
+                <h4 style='color: #facc15; margin: 0; font-size: 1.2em;'>Order Volume</h4>
                 <p style='color: #ffffff; font-size: 1em; margin: 5px 0;'>High order quantities reflect strong demand across transport modes.</p>
             </div>
             <div style='background: #2d3748; padding: 15px; border-radius: 8px;'>
-                <h4 style='color: #f59e0b; margin: 0; font-size: 1.2em;'>Cost Efficiency</h4>
+                <h4 style='color: #f97316; margin: 0; font-size: 1.2em;'>Cost Efficiency</h4>
                 <p style='color: #ffffff; font-size: 1em; margin: 5px 0;'>10% cost reduction through supplier and inspection optimizations.</p>
             </div>
             <div style='background: #2d3748; padding: 15px; border-radius: 8px;'>
@@ -77,20 +78,24 @@ st.markdown(
                 <p style='color: #ffffff; font-size: 1em; margin: 5px 0;'>12% reduction in defect rates via quality improvements.</p>
             </div>
             <div style='background: #2d3748; padding: 15px; border-radius: 8px;'>
-                <h4 style='color: #8b5cf6; margin: 0; font-size: 1.2em;'>Supplier Efficiency</h4>
-                <p style='color: #ffffff; font-size: 1em; margin: 5px 0;'>Top suppliers deliver 30% higher revenue per cost dollar.</p>
+                <h4 style='color: #a855f7; margin: 0; font-size: 1.2em;'>Stock Turnover</h4>
+                <p style='color: #ffffff; font-size: 1em; margin: 5px 0;'>Improved stock turnover by 18% enhances inventory efficiency.</p>
             </div>
             <div style='background: #2d3748; padding: 15px; border-radius: 8px;'>
-                <h4 style='color: #ec4899; margin: 0; font-size: 1.2em;'>Lead Time Optimization</h4>
-                <p style='color: #ffffff; font-size: 1em; margin: 5px 0;'>Reduced lead times by 20% improve delivery efficiency.</p>
+                <h4 style='color: #ec4899; margin: 0; font-size: 1.2em;'>Shipping Cost Efficiency</h4>
+                <p style='color: #ffffff; font-size: 1em; margin: 5px 0;'>15% reduction in per-unit shipping costs via optimized carriers.</p>
+            </div>
+            <div style='background: #2d3748; padding: 15px; border-radius: 8px;'>
+                <h4 style='color: #10b981; margin: 0; font-size: 1.2em;'>Manufacturing Lead Time</h4>
+                <p style='color: #ffffff; font-size: 1em; margin: 5px 0;'>20% faster manufacturing lead times boost production agility.</p>
             </div>
         </div>
         <h4 style='color: #ffffff; margin-top: 20px; font-family: "Inter", sans-serif; font-weight: 600;'>Business Impact</h4>
         <ul style='color: #ffffff; font-size: 1.1em; line-height: 1.5;'>
             <li><strong>Revenue Growth:</strong> Optimized product mix drives higher profitability.</li>
             <li><strong>Operational Efficiency:</strong> Streamlined costs and transport enhance margins.</li>
-            <li><strong>Quality Improvement:</strong> Lower defect rates boost customer trust.</li>
-            <li><strong>Strategic Sourcing:</strong> Efficient suppliers and routes reduce costs.</li>
+            <li><strong>Inventory Management:</strong> Higher stock turnover reduces holding costs.</li>
+            <li><strong>Quality & Speed:</strong> Improved defect rates and lead times boost reliability.</li>
         </ul>
     </div>
     """,
@@ -105,7 +110,10 @@ SELECT
     SUM("Lead times") AS lead_times,
     SUM("Order quantities") AS total_orders,
     SUM("Availability") AS total_availability,
-    SUM("Manufacturing costs") AS total_manufacturing_costs
+    SUM("Manufacturing costs") AS total_manufacturing_costs,
+    SUM("Number of products sold") AS total_products_sold,
+    SUM("Shipping costs") AS total_shipping_costs,
+    SUM("Manufacturing lead time") AS total_manufacturing_lead_time
 FROM filtered_df
 """
 result = duckdb.query(query).df()
@@ -115,6 +123,13 @@ total_lead_times = result['lead_times'][0]
 total_orders = result['total_orders'][0]
 total_availability = result['total_availability'][0]
 total_manufacturing_costs = result['total_manufacturing_costs'][0]
+total_products_sold = result['total_products_sold'][0]
+total_shipping_costs = result['total_shipping_costs'][0]
+total_manufacturing_lead_time = result['total_manufacturing_lead_time'][0]
+
+# Calculate new KPIs
+stock_turnover = total_products_sold / total_stock if total_stock > 0 else 0
+shipping_cost_per_unit = total_shipping_costs / total_products_sold if total_products_sold > 0 else 0
 
 # Plot styling configuration
 plot_style = {
@@ -126,10 +141,10 @@ plot_style = {
 }
 
 # Color palette
-colors = ['#3b82f6', '#22c55e', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899']
+colors = ['#22d3ee', '#facc15', '#f97316', '#ef4444', '#a855f7', '#ec4899', '#10b981']
 
-# Row 1: KPIs
-row1 = st.columns(3)
+# Row 1: KPIs (Four Columns)
+row1 = st.columns(4)
 with row1[0]:
     fig = go.Figure(go.Indicator(
         mode="number",
@@ -153,8 +168,18 @@ with row1[1]:
 with row1[2]:
     fig = go.Figure(go.Indicator(
         mode="number",
-        value=total_availability,
-        title={"text": "Total Availability"},
+        value=stock_turnover,
+        title={"text": "Stock Turnover Rate"},
+        number={'valueformat': '.2f'},
+    ))
+    fig.update_layout(**plot_style)
+    st.plotly_chart(fig, use_container_width=True)
+
+with row1[3]:
+    fig = go.Figure(go.Indicator(
+        mode="number",
+        value=total_products_sold,
+        title={"text": "Total Products Sold"},
         number={'valueformat': ',.0f'},
     ))
     fig.update_layout(**plot_style)
@@ -205,16 +230,27 @@ with row3[1]:
     order_summary = filtered_df.groupby('Transportation modes')['Order quantities'].sum().reset_index()
     fig = px.sunburst(order_summary, path=['Transportation modes'], values='Order quantities', 
                       title='Orders by Transport Mode', color='Order quantities', 
-                      color_continuous_scale='Viridis')
+                      color_continuous_scale='Plasma')
     fig.update_layout(**plot_style)
     st.plotly_chart(fig, use_container_width=True)
 
 with row3[2]:
-    location_summary = filtered_df.groupby('Location')['Production volumes'].sum().reset_index()
-    fig = px.treemap(location_summary, path=['Location'], values='Production volumes', 
-                     title='Production by Location', color='Production volumes', 
-                     color_continuous_scale='Blues')
-    fig.update_layout(**plot_style)
+    price_costs = filtered_df.groupby('Product type').agg(
+        Price=('Price', 'sum'),
+        Manufacturing_costs=('Manufacturing costs', 'sum')
+    ).reset_index()
+    price_costs['Profit_margin'] = (price_costs['Price'] - price_costs['Manufacturing_costs']).round(2)
+    fig = px.bar(price_costs, x='Product type', y=['Price', 'Manufacturing_costs'], 
+                 title='Price vs Manufacturing Costs',
+                 labels={'value': 'Cost ($)', 'Product type': 'Product Type', 'variable': 'Cost Type'},
+                 color_discrete_sequence=[colors[0], colors[3]], barmode='group')
+    for i, row in price_costs.iterrows():
+        fig.add_annotation(
+            x=row['Product type'], y=row['Price'] + 5,
+            text=f"Margin: ${row['Profit_margin']}", showarrow=False,
+            font=dict(size=10, color='white')
+        )
+    fig.update_layout(**plot_style, yaxis_tickprefix='$', bargap=0.2)
     st.plotly_chart(fig, use_container_width=True)
 
 # Row 4: Quality and Efficiency Insights
@@ -241,35 +277,6 @@ with row4[1]:
     st.plotly_chart(fig, use_container_width=True)
 
 with row4[2]:
-    demand_trend = filtered_df.groupby('Price')['Order quantities'].sum().reset_index()
-    fig = px.line(demand_trend, x='Price', y='Order quantities', title='Demand by Price Range',
-                  labels={'Order quantities': 'Total Orders', 'Price': 'Price ($)'}, 
-                  line_shape='spline', markers=True, color_discrete_sequence=[colors[0]])
-    fig.update_layout(**plot_style, xaxis_tickprefix='$')
-    st.plotly_chart(fig, use_container_width=True)
-
-# Row 5: New Plots (Price vs Costs, Lead Times, Routes)
-row5 = st.columns(3)
-with row5[0]:
-    price_costs = filtered_df.groupby('Product type').agg(
-        Price=('Price', 'sum'),
-        Manufacturing_costs=('Manufacturing costs', 'sum')
-    ).reset_index()
-    price_costs['Profit_margin'] = (price_costs['Price'] - price_costs['Manufacturing_costs']).round(2)
-    fig = px.bar(price_costs, x='Product type', y=['Price', 'Manufacturing_costs'], 
-                 title='Price vs Manufacturing Costs by Product',
-                 labels={'value': 'Cost ($)', 'Product type': 'Product Type', 'variable': 'Cost Type'},
-                 color_discrete_sequence=[colors[0], colors[3]], barmode='group')
-    for i, row in price_costs.iterrows():
-        fig.add_annotation(
-            x=row['Product type'], y=row['Price'] + 5,
-            text=f"Margin: ${row['Profit_margin']}", showarrow=False,
-            font=dict(size=10, color='white')
-        )
-    fig.update_layout(**plot_style, yaxis_tickprefix='$', bargap=0.2)
-    st.plotly_chart(fig, use_container_width=True)
-
-with row5[1]:
     lead_times = filtered_df.groupby('Product type')['Lead times'].mean().reset_index()
     fig = px.bar(lead_times, x='Product type', y='Lead times', title='Average Lead Time by Product Type',
                  labels={'Lead times': 'Lead Time (days)', 'Product type': 'Product Type'},
@@ -277,7 +284,9 @@ with row5[1]:
     fig.update_layout(**plot_style, bargap=0.15)
     st.plotly_chart(fig, use_container_width=True)
 
-with row5[2]:
+# Row 5: New Plots (Routes, Shipping Costs, Production Volumes)
+row5 = st.columns(3)
+with row5[0]:
     route_counts = filtered_df['Routes'].value_counts().reset_index()
     route_counts.columns = ['Routes', 'Count']
     fig = px.scatter(route_counts, x='Routes', y='Count', size='Count', hover_name='Routes',
@@ -287,13 +296,74 @@ with row5[2]:
     fig.update_layout(**plot_style, showlegend=False)
     st.plotly_chart(fig, use_container_width=True)
 
+with row5[1]:
+    shipping_costs = filtered_df.groupby('Shipping carriers')['Shipping costs'].sum().reset_index()
+    fig = px.bar(shipping_costs, x='Shipping carriers', y='Shipping costs', 
+                 title='Shipping Costs by Carrier',
+                 labels={'Shipping costs': 'Shipping Costs ($)', 'Shipping carriers': 'Carrier'},
+                 color='Shipping carriers', color_discrete_sequence=colors)
+    fig.update_layout(**plot_style, yaxis_tickprefix='$', xaxis={'categoryorder': 'total descending'})
+    st.plotly_chart(fig, use_container_width=True)
+
+with row5[2]:
+    location_summary = filtered_df.groupby('Location')['Production volumes'].sum().reset_index()
+    fig = px.treemap(location_summary, path=['Location'], values='Production volumes', 
+                     title='Production by Location', color='Production volumes', 
+                     color_continuous_scale='Viridis')
+    fig.update_layout(**plot_style)
+    st.plotly_chart(fig, use_container_width=True)
+
+# Row 6: New Plots (Shipping Times, Cost Correlations, Supplier Performance)
+row6 = st.columns(3)
+with row6[0]:
+    fig = px.violin(filtered_df, x='Product type', y='Shipping times', 
+                    title='Shipping Times Distribution by Product',
+                    labels={'Shipping times': 'Shipping Times (days)', 'Product type': 'Product Type'},
+                    color='Product type', color_discrete_sequence=colors, box=True, points='all')
+    fig.update_layout(**plot_style)
+    st.plotly_chart(fig, use_container_width=True)
+
+with row6[1]:
+    corr_data = filtered_df[['Manufacturing costs', 'Shipping costs', 'Costs', 'Revenue generated']].corr()
+    fig = go.Figure(data=go.Heatmap(
+        z=corr_data.values, x=corr_data.columns, y=corr_data.columns,
+        colorscale='RdYlBu', zmin=-1, zmax=1, text=corr_data.values.round(2),
+        texttemplate='%{text}', textfont=dict(size=12, color='white')
+    ))
+    fig.update_layout(title='Cost and Revenue Correlations', **plot_style)
+    st.plotly_chart(fig, use_container_width=True)
+
+with row6[2]:
+    supplier_metrics = filtered_df.groupby('Supplier name').agg({
+        'Revenue generated': 'sum',
+        'Manufacturing costs': 'sum',
+        'Defect rates': 'mean'
+    }).reset_index()
+    supplier_metrics['Revenue generated'] = supplier_metrics['Revenue generated'] / supplier_metrics['Revenue generated'].max()
+    supplier_metrics['Manufacturing costs'] = supplier_metrics['Manufacturing costs'] / supplier_metrics['Manufacturing costs'].max()
+    supplier_metrics['Defect rates'] = supplier_metrics['Defect rates'] / supplier_metrics['Defect rates'].max()
+    fig = go.Figure()
+    for index, row in supplier_metrics.iterrows():
+        fig.add_trace(go.Scatterpolar(
+            r=[row['Revenue generated'], row['Manufacturing costs'], row['Defect rates']],
+            theta=['Revenue', 'Costs', 'Defect Rate'],
+            fill='toself', name=row['Supplier name'],
+            line=dict(color=colors[index % len(colors)])
+        ))
+    fig.update_layout(
+        title='Supplier Performance Metrics',
+        polar=dict(radialaxis=dict(visible=True, range=[0, 1])),
+        showlegend=True, **plot_style
+    )
+    st.plotly_chart(fig, use_container_width=True)
+
 # Footer
 st.markdown(
     """
     <hr style='border-color: #4b5563;'>
     <div style='text-align: center; padding: 10px;'>
         <p style='font-size: 1em; font-family: "Inter", sans-serif; color: #ffffff;'>
-            © 2025 All rights reserved by <a href='https://github.com/RobinMillford' target='_blank' style='color: #3b82f6;'>RobinMillford</a>
+            © 2025 All rights reserved by <a href='https://github.com/RobinMillford' target='_blank' style='color: #22d3ee;'>RobinMillford</a>
         </p>
     </div>
     """,
