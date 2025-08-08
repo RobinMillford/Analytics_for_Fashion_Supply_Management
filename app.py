@@ -150,7 +150,7 @@ with row1[0]:
         mode="number",
         value=total_revenue,
         title={"text": "Total Revenue"},
-        number={'prefix': '$', 'valueformat': '.2f'},
+        number={'prefix': '$', 'valueformat': ',.0f'},
     ))
     fig.update_layout(**plot_style)
     st.plotly_chart(fig, use_container_width=True)
